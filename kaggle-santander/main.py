@@ -6,6 +6,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
 from sklearn.pipeline import Pipeline
 from sklearn.svm import OneClassSVM
 
@@ -55,15 +56,19 @@ for i in range(len_test):
         X_test[i, -1] = np.nan
 
 # classifier
-clf = xgb.XGBClassifier(missing=np.nan, max_depth=8, n_estimators=400, learning_rate=0.05, nthread=4, subsample=0.9, colsample_bytree=0.85)
+clf = xgb.XGBClassifier(missing=np.nan, max_depth=8, n_estimators=500, learning_rate=0.02, nthread=4, subsample=0.9, colsample_bytree=0.85)
 
-X_train, X_eval, y_train, y_eval= train_test_split(X_train, y_train, test_size=0.33, random_state=142)
+X_fit, X_eval, y_fit, y_eval= train_test_split(X_train, y_train, test_size=0.33, random_state=142)
 
 # fitting
 clf.fit(X_train, y_train, early_stopping_rounds=20, eval_metric="auc", eval_set=[(X_eval, y_eval)])
+
+print('Overall AUC:', roc_auc_score(y_train, clf.predict_proba(X_train)[:,1]))
 
 # predicting
 y_pred= clf.predict_proba(X_test)
 
 submission = pd.DataFrame({"ID":id_test, "TARGET":y_pred[:,1]})
 submission.to_csv("submission.csv", index=False)
+
+print('Complete!')
