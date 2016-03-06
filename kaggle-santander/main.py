@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn import cross_validation
+from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.svm import OneClassSVM
@@ -62,15 +62,18 @@ y_train_spec = y_train
 X_test_spec  = np.array(X_test)[:,0:-1]
 
 # classifier
-clf_norm = xgb.XGBClassifier(max_depth=7, n_estimators=300, learning_rate=0.05)
-clf_spec = xgb.XGBClassifier(max_depth=7, n_estimators=300, learning_rate=0.05)
+clf_norm = xgb.XGBClassifier(max_depth=7, n_estimators=300, learning_rate=0.05, nthread=4)
+clf_spec = xgb.XGBClassifier(max_depth=7, n_estimators=300, learning_rate=0.05, nthread=4)
 
-scores = cross_validation.cross_val_score(clf_norm, X_train_norm, y_train_norm, scoring='roc_auc', cv=5)
-print(scores.mean())
+#scores = cross_validation.cross_val_score(clf_norm, X_train_norm, y_train_norm, scoring='roc_auc', cv=5)
+#print(scores.mean())
+
+X_train_norm, X_eval_norm, y_train_norm, y_eval_norm = train_test_split(X_train_norm, y_train_norm, test_size=0.33, random_state=42)
+X_train_spec, X_eval_spec, y_train_spec, y_eval_spec = train_test_split(X_train_spec, y_train_spec, test_size=0.33, random_state=42)
 
 # fitting
-clf_norm.fit(X_train_norm, y_train_norm)
-clf_spec.fit(X_train_spec, y_train_spec)
+clf_norm.fit(X_train_norm, y_train_norm, early_stopping_rounds=10, eval_metric="auc", eval_set=[(X_eval_norm, y_eval_norm)])
+clf_spec.fit(X_train_spec, y_train_spec, early_stopping_rounds=10, eval_metric="auc", eval_set=[(X_eval_norm, y_eval_norm)])
 
 # predicting
 y_pred_norm = clf_norm.predict_proba(X_test)
