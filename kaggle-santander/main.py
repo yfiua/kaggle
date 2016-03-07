@@ -56,7 +56,7 @@ for i in range(len_test):
         X_test[i, -1] = np.nan
 
 # classifier
-clf = xgb.XGBClassifier(missing=np.nan, max_depth=6, n_estimators=500, learning_rate=0.02, nthread=4, subsample=0.9, colsample_bytree=0.85)
+clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=500, learning_rate=0.02, nthread=4, subsample=0.9, colsample_bytree=0.85)
 
 X_fit, X_eval, y_fit, y_eval= train_test_split(X_train, y_train, test_size=0.33, random_state=142)
 
