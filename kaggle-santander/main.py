@@ -47,13 +47,10 @@ len_train = len(X_train)
 len_test  = len(X_test)
 
 # missing values
-for i in range(len_train):
-    if X_train[i, -1] == 117310.979016494:
-        X_train[i, -1] = np.nan
-
-for i in range(len_test):
-    if X_test[i, -1] == 117310.979016494:
-        X_test[i, -1] = np.nan
+missing_values = [ -999999.0, 9999999999.0, 117310.979016494 ]
+for v in missing_values:
+    X_train[X_train == v] = np.nan
+    X_test[X_test == v] = np.nan
 
 # classifier
 clf = xgb.XGBClassifier(missing=np.nan, max_depth=5, n_estimators=500, learning_rate=0.02, nthread=4, subsample=0.9, colsample_bytree=0.85)
