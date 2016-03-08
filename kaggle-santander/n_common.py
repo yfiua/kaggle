@@ -54,13 +54,14 @@ for i in range(n_col):
         common[j, i] = common[i, j]
 
 ## output numbers of common values between columns
+c = df_train.columns
 f = open('n_common.csv', 'w')
 f.write('0')
 for i in range(n_col):
-    f.write(',' + str(i))
+    f.write(',(' + str(i) + ')' + c[i+1])
 
 for i in range(n_col):
-    f.write('\n' + str(i))
+    f.write('\n(' + str(i) + ')' + c[i+1])
     for j in range(n_col):
         f.write(',' + str(common[i, j]))
 
